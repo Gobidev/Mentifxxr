@@ -9,7 +9,7 @@ def get_new_id():
     return x["identifier"]
 
 
-def get_info(pin, err=True):
+def get_info_from_pin(pin, err=True):
     x = requests.get(
         'https://www.menti.com/core/vote-ids/' + str(pin) + "/series", headers={"user-agent": ""}).text
     try:
@@ -19,6 +19,13 @@ def get_info(pin, err=True):
             print("ERR: No such code")
             exit()
         return False
+
+
+def get_pin_from_url(url_ending):
+    x = requests.get(
+        'https://www.menti.com/core/vote-keys/' + str(url_ending) + "/series", headers={"user-agent": ""}).text\
+        .replace("true", "True").replace("false", "False").replace("null", "None")
+    return eval(x)["vote_id"]
 
 
 def print_info(info):
@@ -168,3 +175,7 @@ def spam(word):
     for x in range(1):
         t1 = Thread(target=add_new_id_to_list)
         idtred.append(t1)
+
+
+if __name__ == '__main__':
+    print(get_pin_from_url("f8fr7oyhd5"))

@@ -12,7 +12,7 @@ def run(pin=None, selected_number=None, times=None):
 
     print()
 
-    y = Mentifxxr.get_info(pin)
+    y = Mentifxxr.get_info_from_pin(pin)
     Mentifxxr.print_info(y)
     t = Mentifxxr.get_active_question_type(y)
     q = Mentifxxr.get_active_questionid(y)
