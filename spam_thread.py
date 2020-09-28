@@ -8,9 +8,10 @@ AMOUNT = 50
 
 
 def run():
+    global PIN, URL
 
     if not PIN and URL:
-        Mentifxxr.get_pin_from_url(URL)
+        PIN = Mentifxxr.get_pin_from_url(URL)
     elif not PIN and not URL:
         print("No presentation specified")
         return
