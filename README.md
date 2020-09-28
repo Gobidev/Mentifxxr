@@ -1,9 +1,7 @@
 # Mentifxxr
-A modern menti.com bot
+Modified version of [Mentifxxr](https://github.com/tokfrans03/Mentifxxr).
 
-This repo holds the code for having fun with mentimeter.
-
-If you're using python you just need requests and run the example script.
-
-It has a we version using vue and cors-anywhewre since you can't send an awnser to menti with a normal browser due to menti's cors policy.
-To start just start the cors anywhere server and the vue project
+- Removed support for all presentation types other than "Choices" (at least for now).
+- Added function to get the pin of a presentation you only have the url for. 
+- Added Python and Bash file to run multiple instances of the spammer over the tor network (Requires tor and python3 to
+be installed on linux)
