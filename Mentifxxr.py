@@ -4,29 +4,24 @@ from threading import Thread
 import datetime
 
 
-def getNewID():
+def get_new_id():
     x = json.loads(requests.post('https://www.menti.com/core/identifier', headers={"user-agent": ""}).text)
     return x["identifier"]
 
 
-def getInfo(pin, err=True):
+def get_info(pin, err=True):
+    x = requests.get(
+        'https://www.menti.com/core/vote-ids/' + str(pin) + "/series", headers={"user-agent": ""}).text
     try:
-        x = requests.get(
-            'https://www.menti.com/core/vote-ids/' + str(pin) + "/series", headers={"user-agent": ""}).text
-    except:
-        print("err", end="\r")
-    try:
-        # print(x)
-        (json.loads(x))["id"]
         return json.loads(x)
     except KeyError:
-        if err == True:
+        if err:
             print("ERR: No such code")
             exit()
         return False
 
 
-def printInfo(info):
+def print_info(info):
     i = 0
     activeid = info["pace"]["active"]
     print("Name:\t\t", info["name"])
@@ -44,7 +39,8 @@ def printInfo(info):
             if (x["type"] == "wordcloud") | (x["type"] == "open"):
                 print("Max Enteries:\t", x["max_nb_words"])
 
-            elif (x["type"] == "choices") | (x["type"] == "choices_images") | (x["type"] == "winner") | (x["type"] == "ranking") | (x["type"] == "scales"):
+            elif (x["type"] == "choices") | (x["type"] == "choices_images") | (x["type"] == "winner") |\
+                    (x["type"] == "ranking") | (x["type"] == "scales"):
                 print("Choices:")
                 for y in x["choices"]:
                     print("\tNo.:\t", y["position"] + 1)
@@ -54,7 +50,7 @@ def printInfo(info):
             print("Public Key:\t", x["public_key"])
 
 
-def listInfo(info):
+def list_info(info):
     l = []
     i = 0
     activeid = info["pace"]["active"]
@@ -73,7 +69,8 @@ def listInfo(info):
             if (x["type"] == "wordcloud") | (x["type"] == "open"):
                 l.append("Max Enteries: " + str(x["max_nb_words"]))
 
-            elif (x["type"] == "choices") | (x["type"] == "choices_images") | (x["type"] == "winner") | (x["type"] == "ranking") | (x["type"] == "scales"):
+            elif (x["type"] == "choices") | (x["type"] == "choices_images") | (x["type"] == "winner") |\
+                    (x["type"] == "ranking") | (x["type"] == "scales"):
                 l.append("Choices:")
                 for y in x["choices"]:
                     l.append("  No.: " + str(y["position"] + 1))
@@ -84,52 +81,46 @@ def listInfo(info):
     return l
 
 
-def getActiveId(info):
+def get_active_id(info):
     return info["pace"]["active"]
 
 
-def getActiveQuestionid(info):
+def get_active_questionid(info):
     activeid = info["pace"]["active"]
     for x in info["questions"]:
         if x["id"] == activeid:
             return x["public_key"]
 
 
-def getActiveQuestionType(info):
+def get_active_question_type(info):
     activeid = info["pace"]["active"]
     for x in info["questions"]:
         if x["id"] == activeid:
             return x["type"]
 
 
-def getActiveQuestion(info):
+def get_active_question(info):
     activeid = info["pace"]["active"]
     for x in info["questions"]:
         if x["id"] == activeid:
             return x["choices"]
 
 
-def getActiveQuestionMinMax(info):
+def get_active_question_min_max(info):
     activeid = info["pace"]["active"]
     for x in info["questions"]:
         if x["id"] == activeid:
             return x["range"]
 
 
-def awnser(Questionid, type, ID, info, awnser):
+def answer(question_id, type, id, info, answer_p):
 
     headers = {
-        "x-identifier": ID,
-        "cookie": "identifier1=" + ID,
+        "x-identifier": id,
+        "cookie": "identifier1=" + id,
         "Content-Type": "application/json",
     }
-
-    # print("Type:", type)
-
     if type == "qfa":
-
-        # print("question is qfa")
-
         quesid = info["id"]
 
         series = json.loads(requests.get(
@@ -137,50 +128,43 @@ def awnser(Questionid, type, ID, info, awnser):
 
         series = series["series_id"]
 
-        data = {"series_id": series, "question": awnser, "user-agent": ""}
-
-        # print("sending", data, "to https://www.menti.com/core/qfa")
+        data = {"series_id": series, "question": answer_p, "user-agent": ""}
 
         requests.post(url='https://www.menti.com/core/qfa',
                       data=json.dumps(data), headers=headers)
 
     else:
 
-        t = getActiveQuestionType(info)
-        u = getActiveQuestion(info)
-        #print("choices:", u)
+        t = get_active_question_type(info)
+        u = get_active_question(info)
         if (t == "choices") | (t == "choices_images") | (t == "winner") | (t == "ranking"):
             # cross reference
             for x in u:
-                if x["position"] + 1 == awnser:
+                if x["position"] + 1 == answer_p:
                     awnser = [(x["id"])]
 
-        data = {"question_type": type, "vote": awnser}
+        data = {"question_type": type, "vote": answer_p}
         # print(data)
 
         headers = {
-            "x-identifier": ID,
-            "cookie": "identifier1=" + ID,
+            "x-identifier": id,
+            "cookie": "identifier1=" + id,
             "Content-Type": "application/json",
             "user-agent": ""
         }
 
         requests.post(url='https://www.menti.com/core/votes/' +
-                      Questionid, data=json.dumps(data), headers=headers)
+                      question_id, data=json.dumps(data), headers=headers)
 
 
-def spamm(word):
+def spam(word):
     ids = []
     idtred = []
 
-    def addnewidtolist():
+    def add_new_id_to_list():
         global ids
-        ids.append(getNewID())
+        ids.append(get_new_id())
 
     for x in range(1):
-        t1 = Thread(target=addnewidtolist)
+        t1 = Thread(target=add_new_id_to_list)
         idtred.append(t1)
-
-
-if __name__ == "__main__":
-    import Example
