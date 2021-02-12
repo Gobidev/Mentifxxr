@@ -178,4 +178,4 @@ def spam(word):
 
 
 if __name__ == '__main__':
-    print(get_pin_from_url("f8fr7oyhd5"))
+    print(get_pin_from_url(""))
